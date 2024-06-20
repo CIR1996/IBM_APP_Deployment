@@ -40,4 +40,52 @@ jobs:
       - name: Build Docker image with Retry
         run: |
           for i in {1..5}; do \
-     
+            docker build -t hello-world-app . && break || \
+            echo "Docker build failed, retrying in 10 seconds... ($i/5)" && sleep 10; \
+          done
+
+      - name: Tag Docker image
+        run: |
+          docker tag hello-world-app ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app
+
+      - name: Install IBM Cloud Code Engine plugin
+        run: |
+          ibmcloud plugin install code-engine -f
+
+      - name: Select or create Code Engine project
+        run: |
+          ibmcloud ce project select --name hello-world-project || \
+          ibmcloud ce project create --name hello-world-project
+
+      - name: Create or update application
+        run: |
+          if ibmcloud ce application get --name hello-world-app; then \
+            ibmcloud ce application update --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 8080; \
+          else \
+            ibmcloud ce application create --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 8080; \
+          fi
+
+      - name: Wait for application to become ready
+        run: |
+          echo "Waiting for application 'hello-world-app' to become ready..."
+          for i in {1..30}; do \
+            if ibmcloud ce application get --name hello-world-app --output json | jq -e '.status.state == "ready"'; then \
+              echo "Application is ready."; \
+              break; \
+            else \
+              echo "Waiting for application to be ready... (attempt $i)"; \
+              sleep 20; \
+            fi; \
+          done
+          if ! ibmcloud ce application get --name hello-world-app --output json | jq -e '.status.state == "ready"'; then \
+            echo "Application did not become ready in time."; \
+            exit 1; \
+          fi
+
+      - name: Get application URL
+        run: |
+          ibmcloud ce application get --name hello-world-app --output url

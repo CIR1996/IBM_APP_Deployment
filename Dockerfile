@@ -1,10 +1,10 @@
 # Use a slimmer version of the official Python image from Docker Hub
-FROM python:3.8-slim
+FROM python:3.9-slim
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Install Git
+# Install Git (not needed for this simple app, but included as per previous context)
 RUN apt-get update && apt-get install -y git
 
 # Copy the requirements file into the container
@@ -21,6 +21,3 @@ EXPOSE 8080
 
 # Define the command to run the application
 CMD [ "python", "./app.py" ]
-
-#finish
-

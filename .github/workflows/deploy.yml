@@ -36,12 +36,15 @@ jobs:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
         run: |
-          echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: Tag Docker image
+        run: |
+          docker tag tic-tac-toe-app ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker tag tic-tac-toe-app $DOCKER_HUB_USERNAME/tic-tac-toe-app
-          docker push $DOCKER_HUB_USERNAME/tic-tac-toe-app
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app
 
       - name: Install IBM Cloud Code Engine plugin
         run: |
@@ -51,8 +54,8 @@ jobs:
         run: |
           ibmcloud ce project create --name tic-tac-toe-project || echo "Project exists"
           ibmcloud ce project select --name tic-tac-toe-project
-          ibmcloud ce application create --name tic-tac-toe-app --image $DOCKER_HUB_USERNAME/tic-tac-toe-app --port 8080 || \
-          ibmcloud ce application update --name tic-tac-toe-app --image $DOCKER_HUB_USERNAME/tic-tac-toe-app
+          ibmcloud ce application create --name tic-tac-toe-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app --port 8080 || \
+          ibmcloud ce application update --name tic-tac-toe-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app
 
       - name: Get application URL
         run: |

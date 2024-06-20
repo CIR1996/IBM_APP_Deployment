@@ -1,0 +1,59 @@
+name: Deploy to IBM Cloud
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up IBM Cloud CLI
+        run: |
+          curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+
+      - name: Log in to IBM Cloud
+        env:
+          IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
+        run: |
+          ibmcloud login --apikey $IBM_CLOUD_API_KEY -r ${{ secrets.IBM_CLOUD_REGION }}
+
+      - name: Set target resource group
+        run: |
+          ibmcloud target -g ${{ secrets.IBM_CLOUD_RESOURCE_GROUP }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t tic-tac-toe-app .
+
+      - name: Log in to Docker Hub
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        run: |
+          echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker tag tic-tac-toe-app $DOCKER_HUB_USERNAME/tic-tac-toe-app
+          docker push $DOCKER_HUB_USERNAME/tic-tac-toe-app
+
+      - name: Install IBM Cloud Code Engine plugin
+        run: |
+          ibmcloud plugin install code-engine -f
+
+      - name: Create or update Code Engine project and app
+        run: |
+          ibmcloud ce project create --name tic-tac-toe-project || echo "Project exists"
+          ibmcloud ce project select --name tic-tac-toe-project
+          ibmcloud ce application create --name tic-tac-toe-app --image $DOCKER_HUB_USERNAME/tic-tac-toe-app --port 8080 || \
+          ibmcloud ce application update --name tic-tac-toe-app --image $DOCKER_HUB_USERNAME/tic-tac-toe-app
+
+      - name: Get application URL
+        run: |
+          ibmcloud ce application get --name tic-tac-toe-app --output url

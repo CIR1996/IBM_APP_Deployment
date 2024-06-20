@@ -27,22 +27,16 @@ jobs:
         run: |
           ibmcloud target -g ${{ secrets.IBM_CLOUD_RESOURCE_GROUP }}
 
-      - name: Docker Hub Login with Retry
+      - name: Build Docker image
+        run: |
+          docker build -t hello-world-app .
+
+      - name: Log in to Docker Hub
         env:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
         run: |
-          for i in {1..5}; do \
-            echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin && break || \
-            echo "Docker login failed, retrying in 10 seconds... ($i/5)" && sleep 10; \
-          done
-
-      - name: Build Docker image with Retry
-        run: |
-          for i in {1..5}; do \
-            docker build -t hello-world-app . && break || \
-            echo "Docker build failed, retrying in 10 seconds... ($i/5)" && sleep 10; \
-          done
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
       - name: Tag Docker image
         run: |
@@ -67,23 +61,6 @@ jobs:
             ibmcloud ce application update --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 8080; \
           else \
             ibmcloud ce application create --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 8080; \
-          fi
-
-      - name: Wait for application to become ready
-        run: |
-          echo "Waiting for application 'hello-world-app' to become ready..."
-          for i in {1..30}; do \
-            if ibmcloud ce application get --name hello-world-app --output json | jq -e '.status.state == "ready"'; then \
-              echo "Application is ready."; \
-              break; \
-            else \
-              echo "Waiting for application to be ready... (attempt $i)"; \
-              sleep 20; \
-            fi; \
-          done
-          if ! ibmcloud ce application get --name hello-world-app --output json | jq -e '.status.state == "ready"'; then \
-            echo "Application did not become ready in time."; \
-            exit 1; \
           fi
 
       - name: Get application URL

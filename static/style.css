@@ -1,28 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h1>Weather Dashboard</h1>
-        <form action="/weather" method="POST">
-            <input type="text" name="city" placeholder="Enter city name" required>
-            <button type="submit">Get Weather</button>
-        </form>
+/* Reset some basic styles */
+body, h1, h2, p, form, input, button {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
 
-        {% if weather_data %}
-        <div class="weather-info">
-            <h2>Weather in {{ city }}</h2>
-            <p>Temperature: {{ weather_data.main.temp }} °C</p>
-            <p>Humidity: {{ weather_data.main.humidity }} %</p>
-            <p>Description: {{ weather_data.weather[0].description }}</p>
-            <img src="http://openweathermap.org/img/wn/{{ weather_data.weather[0].icon }}@2x.png" alt="Weather icon">
-        </div>
-        {% endif %}
-    </div>
-</body>
-</html>
+/* Centering the content */
+body {
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Main container styling */
+.container {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+    border-radius: 8px;
+}
+
+/* Form styling */
+form {
+    margin-bottom: 20px;
+}
+
+/* Input field styling */
+input[type="text"] {
+    padding: 10px;
+    width: 200px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+/* Button styling */
+button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Weather info container */
+.weather-info {
+    margin-top: 20px;
+}
+
+/* Weather icon styling */
+.weather-info img {
+    display: block;
+    margin: 0 auto;
+}
+
+.weather-info p, .weather-info h2 {
+    margin: 10px 0;
+}

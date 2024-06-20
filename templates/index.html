@@ -16,9 +16,9 @@
 
         {% if weather_data %}
         <div class="weather-info">
-            <h2>Weather in {{ city }}</h2>
-            <p>Temperature: {{ weather_data.main.temp }} °C</p>
-            <p>Humidity: {{ weather_data.main.humidity }} %</p>
+            <h2>Wetter in {{ city }}</h2>
+            <p>Temperatur: {{ weather_data.main.temp }} °C</p>
+            <p>Feuchtigkeit: {{ weather_data.main.humidity }} %</p>
             <p>Description: {{ weather_data.weather[0].description }}</p>
             <img src="http://openweathermap.org/img/wn/{{ weather_data.weather[0].icon }}@2x.png" alt="Weather icon">
         </div>

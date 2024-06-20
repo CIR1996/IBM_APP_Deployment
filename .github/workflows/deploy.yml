@@ -58,9 +58,26 @@ jobs:
       - name: Create or update application
         run: |
           if ibmcloud ce application get --name weather-dashboard-app; then \
-            ibmcloud ce application update --name weather-dashboard-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/weather-dashboard-app; \
+            ibmcloud ce application update --name weather-dashboard-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/weather-dashboard-app --port 8080; \
           else \
             ibmcloud ce application create --name weather-dashboard-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/weather-dashboard-app --port 8080; \
+          fi
+
+      - name: Wait for application to become ready
+        run: |
+          echo "Waiting for application 'weather-dashboard-app' to become ready..."
+          for i in {1..30}; do \
+            if ibmcloud ce application get --name weather-dashboard-app --output json | jq -e '.status.state == "ready"'; then \
+              echo "Application is ready."; \
+              break; \
+            else \
+              echo "Waiting for application to be ready... (attempt $i)"; \
+              sleep 20; \
+            fi; \
+          done
+          if ! ibmcloud ce application get --name weather-dashboard-app --output json | jq -e '.status.state == "ready"'; then \
+            echo "Application did not become ready in time."; \
+            exit 1; \
           fi
 
       - name: Get application URL

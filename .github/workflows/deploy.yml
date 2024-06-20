@@ -29,16 +29,15 @@ jobs:
 
       - name: Docker Hub Login with Debug
         env:
-          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+            DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+            DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
         run: |
-          echo "Docker Hub Username: $DOCKER_HUB_USERNAME"
-          for i in {1..5}; do \
-            echo "Attempt $i: Logging into Docker Hub..." && \
-            echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin && break || \
-            echo "Docker login failed, retrying in 10 seconds... ($i/5)" && sleep 10; \
-          done
-
+            echo "Docker Hub Username: $DOCKER_HUB_USERNAME"
+            for i in {1..5}; do \
+                echo "Attempt $i: Logging into Docker Hub..." && \
+                echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin && break || \
+                echo "Docker login failed, retrying in 10 seconds... ($i/5)" && sleep 10; \
+            done
       - name: Build Docker image with Retry
         run: |
           for i in {1..5}; do \
@@ -75,7 +74,7 @@ jobs:
         run: |
           echo "Waiting for application 'hello-world-app' to become ready..."
           for i in {1..30}; do \
-            if ibmcloud ce application get --name hello-world-app --output json | jq -e '.status.state == "ready"'; then \
+            if ibmcloud ce application get --name hello-world-app --output json | jq -e '.status.conditions[0].type == "Ready" and .status.conditions[0].status == "True"'; then \
               echo "Application is ready."; \
               break; \
             else \
@@ -83,7 +82,7 @@ jobs:
               sleep 20; \
             fi; \
           done
-          if ! ibmcloud ce application get --name hello-world-app --output json | jq -e '.status.state == "ready"'; then \
+          if ! ibmcloud ce application get --name hello-world-app --output json | jq -e '.status.conditions[0].type == "Ready" and .status.conditions[0].status == "True"'; then \
             echo "Application did not become ready in time."; \
             exit 1; \
           fi

@@ -50,12 +50,18 @@ jobs:
         run: |
           ibmcloud plugin install code-engine -f
 
-      - name: Create or update Code Engine project and app
+      - name: Select or create Code Engine project
         run: |
-          ibmcloud ce project create --name tic-tac-toe-project || echo "Project exists"
-          ibmcloud ce project select --name tic-tac-toe-project
-          ibmcloud ce application create --name tic-tac-toe-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app --port 8080 || \
-          ibmcloud ce application update --name tic-tac-toe-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app
+          ibmcloud ce project select --name tic-tac-toe-project || \
+          ibmcloud ce project create --name tic-tac-toe-project
+
+      - name: Create or update application
+        run: |
+          if ibmcloud ce application get --name tic-tac-toe-app; then \
+            ibmcloud ce application update --name tic-tac-toe-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app; \
+          else \
+            ibmcloud ce application create --name tic-tac-toe-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app --port 8080; \
+          fi
 
       - name: Get application URL
         run: |

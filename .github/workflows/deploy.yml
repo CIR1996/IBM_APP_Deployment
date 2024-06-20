@@ -29,7 +29,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t tic-tac-toe-app .
+          docker build -t weather-dashboard-app .
 
       - name: Log in to Docker Hub
         env:
@@ -40,11 +40,11 @@ jobs:
 
       - name: Tag Docker image
         run: |
-          docker tag tic-tac-toe-app ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app
+          docker tag weather-dashboard-app ${{ secrets.DOCKER_HUB_USERNAME }}/weather-dashboard-app
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/weather-dashboard-app
 
       - name: Install IBM Cloud Code Engine plugin
         run: |
@@ -52,17 +52,17 @@ jobs:
 
       - name: Select or create Code Engine project
         run: |
-          ibmcloud ce project select --name tic-tac-toe-project || \
-          ibmcloud ce project create --name tic-tac-toe-project
+          ibmcloud ce project select --name weather-dashboard-project || \
+          ibmcloud ce project create --name weather-dashboard-project
 
       - name: Create or update application
         run: |
-          if ibmcloud ce application get --name tic-tac-toe-app; then \
-            ibmcloud ce application update --name tic-tac-toe-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app; \
+          if ibmcloud ce application get --name weather-dashboard-app; then \
+            ibmcloud ce application update --name weather-dashboard-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/weather-dashboard-app; \
           else \
-            ibmcloud ce application create --name tic-tac-toe-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/tic-tac-toe-app --port 8080; \
+            ibmcloud ce application create --name weather-dashboard-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/weather-dashboard-app --port 8080; \
           fi
 
       - name: Get application URL
         run: |
-          ibmcloud ce application get --name tic-tac-toe-app --output url
+          ibmcloud ce application get --name weather-dashboard-app --output url

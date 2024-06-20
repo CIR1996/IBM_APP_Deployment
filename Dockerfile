@@ -1,10 +1,10 @@
-# Use the official Python image from the Docker Hub
+# Use a slimmer version of the official Python image from Docker Hub
 FROM python:3.9-slim
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-#install GIT
+# Install Git
 RUN apt-get update && apt-get install -y git
 
 # Copy the requirements file into the container

@@ -70,23 +70,6 @@ jobs:
             ibmcloud ce application create --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 8080; \
           fi
 
-      - name: Wait for application to become ready
-        run: |
-          echo "Waiting for application 'hello-world-app' to become ready..."
-          for i in {1..30}; do \
-            if ibmcloud ce application get --name hello-world-app --output json | jq -e '.status.conditions[0].type == "Ready" and .status.conditions[0].status == "True"'; then \
-              echo "Application is ready."; \
-              break; \
-            else \
-              echo "Waiting for application to be ready... (attempt $i)"; \
-              sleep 20; \
-            fi; \
-          done
-          if ! ibmcloud ce application get --name hello-world-app --output json | jq -e '.status.conditions[0].type == "Ready" and .status.conditions[0].status == "True"'; then \
-            echo "Application did not become ready in time."; \
-            exit 1; \
-          fi
-
       - name: Get application URL
         run: |
           ibmcloud ce application get --name hello-world-app --output url

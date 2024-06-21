@@ -66,9 +66,9 @@ jobs:
       - name: Create or update application
         run: |
           if ibmcloud ce application get --name hello-world-app; then \
-            ibmcloud ce application update --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 3000 --readiness-probe 'type=http,path=/,port=3000'; \
+            ibmcloud ce application update --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 8080 --probe-ready type=http,path=/,port=8080; \
           else \
-            ibmcloud ce application create --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 3000 --readiness-probe 'type=http,path=/,port=3000'; \
+            ibmcloud ce application create --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 8080 --probe-ready type=http,path=/,port=8080; \
           fi
 
       - name: Retrieve application logs

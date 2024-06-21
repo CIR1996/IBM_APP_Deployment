@@ -60,8 +60,8 @@ jobs:
 
       - name: Select or create Code Engine project
         run: |
-          ibmcloud ce project select --name APP-Deployment_IBM || \
-          ibmcloud ce project create --name APP-Deployment_IBM
+          ibmcloud ce project select --name APP-Deployment-IBM || \
+          ibmcloud ce project create --name APP-Deployment-IBM
 
       - name: Create or update application
         run: |

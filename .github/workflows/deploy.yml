@@ -60,21 +60,21 @@ jobs:
 
       - name: Select or create Code Engine project
         run: |
-          ibmcloud ce project select --name hello-world-project || \
-          ibmcloud ce project create --name hello-world-project
+          ibmcloud ce project select --name APP-Deployment_IBM || \
+          ibmcloud ce project create --name APP-Deployment_IBM
 
       - name: Create or update application
         run: |
-          if ibmcloud ce application get --name hello-world-app; then \
-            ibmcloud ce application update --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 3000; \
+          if ibmcloud ce application get --name APP-Deployment_IBM; then \
+            ibmcloud ce application update --name APP-Deployment_IBM --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 3000; \
           else \
-            ibmcloud ce application create --name hello-world-app --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 3000; \
+            ibmcloud ce application create --name APP-Deployment_IBM --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 3000; \
           fi
 
       - name: Retrieve application logs
         run: |
-          ibmcloud ce application logs --name hello-world-app --tail 100
+          ibmcloud ce application logs --name APP-Deployment_IBM --tail 100
 
       - name: Get application URL
         run: |
-          ibmcloud ce application get --name hello-world-app --output url
+          ibmcloud ce application get --name APP-Deployment_IBM --output url

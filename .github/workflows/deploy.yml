@@ -65,16 +65,16 @@ jobs:
 
       - name: Create or update application
         run: |
-          if ibmcloud ce application get --name APP-Deployment_IBM; then \
-            ibmcloud ce application update --name APP-Deployment_IBM --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 3000; \
+          if ibmcloud ce application get --name webapp; then \
+            ibmcloud ce application update --name webapp --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 3000; \
           else \
-            ibmcloud ce application create --name APP-Deployment_IBM --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 3000; \
+            ibmcloud ce application create --name webapp --image ${{ secrets.DOCKER_HUB_USERNAME }}/hello-world-app --port 3000; \
           fi
 
       - name: Retrieve application logs
         run: |
-          ibmcloud ce application logs --name APP-Deployment_IBM --tail 100
+          ibmcloud ce application logs --name webapp --tail 100
 
       - name: Get application URL
         run: |
-          ibmcloud ce application get --name APP-Deployment_IBM --output url
+          ibmcloud ce application get --name webapp --output url

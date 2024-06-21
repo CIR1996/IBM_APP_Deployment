@@ -19,6 +19,7 @@ COPY . .
 
 # Expose the port the app runs on
 EXPOSE 3000
+#maybe it works now
 
 # Define the command to run the application using gunicorn
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:3000", "app:app"]
